@@ -4,7 +4,7 @@ set -euo pipefail
 # ---- settings you can customize ----
 PROJECT_NAME="${PROJECT_NAME:-prosafetymatch-app}"
 REQUIRED_NODE="20.19.0"
-REQUIRED_CMDS=("pnpm" "node" "vercel")
+REQUIRED_CMDS=("pnpm" "node" "vercel" "git")
 CUSTOM_DOMAIN="${CUSTOM_DOMAIN:-}"   # e.g. prosafetymatch.app  (optional)
 # ------------------------------------
 
@@ -76,13 +76,38 @@ if [ -n "$CUSTOM_DOMAIN" ]; then
   fi
 fi
 
-# 9) Git connection hint
+# 9) Git check + auto commit & push
 if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   pass "Git repository present"
   echo "— Git remotes:"
   git remote -v || true
+
+  # Detect current branch
+  CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+  echo "Current branch: $CURRENT_BRANCH"
+
+  # Stage all changes
+  git add -A
+
+  # Commit only if there are staged changes
+  if ! git diff --cached --quiet; then
+    COMMIT_MSG="chore: auto-check-deploy commit $(date +'%Y-%m-%d %H:%M:%S')"
+    echo "Committing changes: $COMMIT_MSG"
+    git commit -m "$COMMIT_MSG"
+  else
+    echo "No changes to commit."
+  fi
+
+  # Ensure remote exists
+  if git remote get-url origin >/dev/null 2>&1; then
+    echo "Pushing branch $CURRENT_BRANCH to origin..."
+    git push -u origin "$CURRENT_BRANCH"
+    pass "Changes pushed to GitHub successfully."
+  else
+    warn "No remote 'origin' found. Please add it first: git remote add origin <repo-url>"
+  fi
 else
-  warn "Not a Git repository"
+  warn "Not a Git repository; skipping Git commit & push."
 fi
 
 echo
