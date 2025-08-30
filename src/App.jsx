@@ -1,22 +1,28 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import DashboardLayout from "./layouts/DashboardLayout.jsx";
 import MarketingLayout from "./layouts/MarketingLayout.jsx";
-
-// Pages
 import LandingPage from "./features/landing/LandingPage.jsx";
-import LoginPage from "./pages/LoginPage.jsx"; // ✅ your file
+import LoginPage from "./pages/LoginPage.jsx"; // Fixed variable name
+import Dashboard from "./features/dashboard/Dashboard.jsx";
+import ProtectedRoute from "./features/landing/components/ProtectedRoute.jsx"; // Import the ProtectedRoute wrapper
 
 export default function App() {
   return (
     <Routes>
-      {/* Public/marketing routes WITHOUT sidebar */}
       <Route element={<MarketingLayout />}>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPag />} />
+        <Route index element={<LandingPage />} />  {/* "/" */}
+        <Route path="/login" element={<LoginPage />} />
+        {/* Wrap Dashboard route with ProtectedRoute */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
       </Route>
-
-      {/* (Optional) other app routes with your sidebar layout can go here */}
-
-      {/* Fallback */}
+      {/* Catch-all route */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

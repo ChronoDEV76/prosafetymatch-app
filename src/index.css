@@ -2,83 +2,151 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ------------ Base layer: typografie & focus --------------- */
+/* ============================================================
+   Base layer: tokens, resets, background, focus, and a11y
+   ============================================================ */
 @layer base {
   html, body, #root {
     height: 100%;
   }
 
   :root {
-    /* optioneel: kleur-tokens die je soms buiten Tailwind gebruikt */
-    --brand: #4F46E5;
+    /* Brand tokens */
+    --brand:        #4F46E5; /* indigo-600 */
+    --brand-500:    #6366F1; /* indigo-500 */
+    --brand-700:    #4338CA; /* indigo-700 */
+    --violet-600:   #7C3AED;
+    --ink:          #0B1220; /* deep slate background */
+    --card:         #FFFFFF;
+
+    /* Shadow tokens (used below for .shadow-soft/.shadow-glass) */
+    --shadow-soft:  0 1px 2px rgba(0,0,0,.06), 0 6px 28px rgba(0,0,0,.10);
+    --shadow-glass: 0 8px 30px rgba(2,6,23,.12);
   }
 
+  /* Global background + text */
   body {
-    @apply bg-white text-slate-900 antialiased;
+    @apply antialiased;
+    background-color: var(--ink);
+    color: #E5E7EB; /* slate-200-ish for base text on dark */
     font-feature-settings: "ss01" 1, "case" 1; /* Inter goodies */
+    scroll-behavior: smooth;
   }
 
-  /* Nette, consistente focus state voor keyboard users */
+  /* Make selection on-brand */
+  ::selection {
+    background: color-mix(in srgb, var(--brand) 35%, white);
+    color: #0B1220;
+  }
+
+  /* Respect users who prefer reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Consistent, visible keyboard focus */
   *:focus-visible {
-    @apply outline-none ring-2 ring-brand/60 ring-offset-2 ring-offset-white;
+    outline: none;
+    box-shadow:
+      0 0 0 2px color-mix(in srgb, var(--brand) 65%, transparent),
+      0 0 0 4px color-mix(in srgb, white 100%, transparent);
   }
 }
 
-/* ------------ Component layer: herbruikbare klassen -------- */
+/* ============================================================
+   Component layer: buttons, inputs, cards, chips, shadows
+   ============================================================ */
 @layer components {
-  /* Buttons */
+  /* ---------- Shadows (no Tailwind config needed) ---------- */
+  .shadow-soft  { box-shadow: var(--shadow-soft); }
+  .shadow-glass { box-shadow: var(--shadow-glass); }
+
+  /* ---------- Buttons ---------- */
   .btn {
     @apply inline-flex items-center justify-center rounded-xl px-5 py-3 text-sm font-medium
-           transition ease-expo disabled:opacity-60 disabled:pointer-events-none;
+           transition ease-out duration-200 disabled:opacity-60 disabled:pointer-events-none;
+    will-change: transform, box-shadow, background-color;
   }
 
   .btn-primary {
-    @apply btn bg-brand text-white hover:bg-brand-dark shadow-soft;
+    @apply text-white shadow-soft;
+    background: var(--brand);
   }
+  .btn-primary:hover { background: var(--brand-700); }
 
   .btn-ghost {
-    @apply btn bg-white/10 text-white ring-1 ring-white/30 hover:bg-white/15;
+    @apply text-white ring-1 ring-white/30;
+    background: rgba(255,255,255,0.10);
   }
+  .btn-ghost:hover { background: rgba(255,255,255,0.15); }
 
   .btn-outline {
-    @apply btn border border-slate-300 text-slate-800 hover:bg-slate-50;
+    @apply border border-slate-300 text-slate-800 bg-transparent hover:bg-slate-50;
   }
 
-  /* Inputs/selects (als je @tailwindcss/forms via strategy:class gebruikt) */
+  /* ---------- Inputs / selects ---------- */
   .input {
     @apply w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm
-           placeholder:text-slate-400 focus:ring-2 focus:ring-brand;
+           placeholder:text-slate-400 focus:ring-2 focus:ring-[color:var(--brand)] focus:border-transparent;
+    color: #0F172A; /* slate-900 for inputs */
   }
 
   .select {
     @apply w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm
-           focus:ring-2 focus:ring-brand;
+           focus:ring-2 focus:ring-[color:var(--brand)] focus:border-transparent;
+    color: #0F172A;
   }
 
-  /* Cards */
+  /* ---------- Cards ---------- */
   .card {
     @apply rounded-2xl border border-slate-200 bg-white shadow-soft;
+    color: #0F172A;
   }
 
   .glass-card {
     @apply rounded-2xl border border-white/40 bg-white/70 backdrop-blur-sm shadow-glass;
+    color: #0F172A;
   }
 
+  /* ---------- Chips ---------- */
   .chip {
     @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-medium;
   }
   .chip-ghost {
-    @apply chip bg-white/10 text-white ring-1 ring-white/30;
+    @apply chip ring-1 ring-white/30;
+    background: rgba(255,255,255,0.10);
+    color: white;
   }
 }
 
-/* ------------ Utilities layer: optionele extra utils -------- */
+/* ============================================================
+   Utilities layer: containers & background helpers
+   ============================================================ */
 @layer utilities {
-  .container-narrow {
-    @apply max-w-3xl mx-auto px-4 sm:px-6 lg:px-8;
+  .container-narrow { @apply max-w-3xl mx-auto px-4 sm:px-6 lg:px-8; }
+  .container-wide   { @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
+
+  /* If you ever want a full app background helper on a section */
+  .bg-app {
+    background-color: var(--ink);
+    background-image:
+      radial-gradient(1200px 800px at 50% 20%, rgba(79,70,229,0.15) 0%, rgba(99,102,241,0.08) 45%, rgba(15,23,42,0.02) 100%),
+      linear-gradient(135deg, rgba(79,70,229,0.18) 0%, rgba(109,40,217,0.14) 40%, rgba(124,58,237,0.08) 70%, transparent 85%);
+    background-repeat: no-repeat;
   }
-  .container-wide {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+
+  /* Tiny helper to apply a soft grain overlay (use via <div class="noise-mask"> inside a wrapper) */
+  .noise-mask {
+    background-image:
+      url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2248%22 height=%2248%22 viewBox=%220 0 48 48%22><filter id=%22n%22 x=%22-20%25%22 y=%22-20%25%22 width=%22140%25%22 height=%22140%25%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%222%22 stitchTiles=%22stitch%22/></filter><rect width=%2248%22 height=%2248%22 filter=%22url(%23n)%22 opacity=%220.35%22/></svg>');
+    mix-blend-mode: soft-light;
+    opacity: .08;
+    pointer-events: none;
   }
 }
 

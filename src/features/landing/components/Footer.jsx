@@ -1,6 +1,6 @@
 import React from 'react';
 
-// src/components/Footer.js
+// src/features/landing/components/Footer.jsx
 export default function Footer() {
   return (
     <footer className="mt-14 border-t border-black/10">

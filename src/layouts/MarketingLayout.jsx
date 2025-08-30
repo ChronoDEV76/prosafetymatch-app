@@ -1,6 +1,5 @@
 import { Outlet } from "react-router-dom";
 import Header from "../features/landing/components/Header.jsx";
-// (Optional) add a footer later if you want
 
 export default function MarketingLayout() {
   return (
