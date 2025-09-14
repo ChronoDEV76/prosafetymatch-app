@@ -17,10 +17,10 @@ export default function Header() {
           <a href="#how" className="text-slate-700 hover:text-indigo-600">Hoe werkt het</a>
           <Link to="/login" className="text-slate-700 hover:text-indigo-600">Inloggen</Link>
           <Link
-            to="/login"
+            to="/signup"
             className="rounded-xl bg-indigo-600 text-white px-4 py-2 hover:bg-indigo-700 transition"
           >
-            Aanmelden
+            Aanmaken
           </Link>
         </nav>
       </div>

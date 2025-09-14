@@ -40,5 +40,7 @@ export async function sendOtpMail({ to, code }) {
     });
     console.log(`Verificatiecode e-mail verstuurd naar ${to}: ${info.messageId}`);
   } catch (error) {
-    console.error("Fout bij versturen verificatiecode
-
+    console.error("Fout bij versturen verificatiecode:", error);
+    throw error;
+  }
+}
